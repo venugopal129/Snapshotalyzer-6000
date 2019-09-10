@@ -99,7 +99,11 @@ def stop_instances(project):
     instances=filter_instances(project)
     for i in instances:
         print('Stopping {0}....'.format(i.id))
-        i.stop()
+        try:
+            i.stop()
+        except boto3.exceptions.botocore.exceptions.ClientError as e:
+            print('Cannot stop instance {0}..'.format(i.id)+str(e))
+            continue
     return
 
 @instances.command('start')
@@ -109,7 +113,11 @@ def start_instanes(project):
     instances=filter_instances(project)
     for i in instances:
         print('Starting {0}...'.format(i.id))
-        i.start()
+        try:
+            i.start()
+        except boto3.exceptions.botocore.exceptions.ClientError as e:
+            print('Cannot start instance {0}..'.format(i.id)+str(e))
+            continue
 
     return
 if __name__=='__main__':
