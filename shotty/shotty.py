@@ -20,7 +20,8 @@ def snapshots():
     """Commands for snapshotps"""
 @snapshots.command('list')
 @click.option('--project',default=None,help="only snapshots of volmes for poject(tag Project:<name>)")
-def list_snapshots(project):
+@click.option('--all','list_all',default=False,is_flag=True,help="list all snapshots not just latest snapshots")
+def list_snapshots(project,list_all):
     """List snapshots of volumes for a project"""
     instances=filter_instances(project)
     for i in instances:
@@ -34,6 +35,21 @@ def list_snapshots(project):
                 s.progress,
                 s.start_time.strftime("%c")
                 )))
+                if s.state=="completed" and not list_all: break
+
+    return
+
+@snapshots.command('delete')
+@click.option('--project',default=None,help="only snapshots of volmes for poject(tag Project:<name>)")
+def delete_snapshots(project):
+    """List snapshots of volumes for a project"""
+    instances=filter_instances(project)
+    for i in instances:
+        for v in i.volumes.all():
+            for s in v.snapshots.all():
+                s.delete()
+
+
     return
 
 @cli.group('volumes')
